@@ -1,105 +1,218 @@
-# 📘 Student Management System (CRUD Application)
+# 🎓 Student Management System (AWS + Docker Deployment)
 
-This project is a simple **Student Management System** built using **Spring Boot MVC**, **Spring Data JPA**, and **MySQL**.  
+## 📌 Project Description
 
-It allows users to perform basic CRUD operations:
+This is a simple Student Management System CRUD Application built using:
 
-- ➕ Add Student  
-- 📄 View All Students  
-- ✏ Update Student  
-- ❌ Delete Student  
+- Backend: Java + Spring Boot  
+- Frontend: ReactJS  
+- Database: MySQL  
+- Containerization: Docker  
+- Cloud: AWS (EC2, RDS, S3)
 
-The application follows a proper layered architecture:  
-**Controller → Service → Repository → Database**
+The application allows users to:
+
+- Add new students  
+- View all students  
+- Update student details  
+- Delete students  
 
 ---
 
-## 🛠 Technologies Used
+## 🏗️ Tech Stack
 
 ### Backend
 - Java 17
 - Spring Boot
-- Spring MVC
-- Spring Data JPA (Hibernate)
+- Spring Data JPA
+- Maven
 
 ### Frontend
-- Thymeleaf Template Engine
-- HTML
-- CSS
+- ReactJS
+- Axios
 - Bootstrap
 
 ### Database
-- MySQL
+- MySQL (AWS RDS)
 
-### Build Tool
-- Maven
+### DevOps & Cloud
+- Docker
+- AWS EC2
+- AWS RDS
+- AWS S3
 
 ---
 
-## 🏗 Project Structure
+## 📂 Project Structure
 
 ```
-src/main/java/learn/spring/studentmanagement/
+student-management-system/
 │
-├── Controller      → Handles HTTP requests
-├── Service         → Business logic
-├── repository      → Database operations using JPA
-├── Entity          → Student model class
-└── StudentManagementSystemApplication.java
-```
-
-```
-src/main/resources/
-└── application.properties   → Database configuration
+├── backend/
+│   ├── .mvn/
+│   ├── src/
+│   │   └── main/
+│   │       ├── java/com/example/student/
+│   │       │   ├── controller/
+│   │       │   ├── service/
+│   │       │   ├── repository/
+│   │       │   └── model/
+│   │       └── resources/
+│   │           └── application.properties
+│   │
+│   ├── pom.xml
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AddStudent.js
+│   │   │   ├── ListStudent.js
+│   │   │   └── UpdateStudent.js
+│   │   ├── services/
+│   │   │   └── StudentService.js
+│   │   ├── App.js
+│   │   └── index.js
+│   │
+│   ├── package.json
+│   └── Dockerfile
+│
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
 
-## ⚙ How to Run the Project
+## ☁️ AWS Architecture
 
-### 1️⃣ Create Database in MySQL
+User → S3 (React Frontend)  
+        ↓  
+EC2 (Docker Container - Spring Boot Backend)  
+        ↓  
+RDS (MySQL Database)
 
-```sql
-CREATE DATABASE studentdb;
+### AWS Services Used
+
+1. EC2  
+   - Hosts backend Docker container  
+   - Runs Spring Boot application  
+
+2. RDS (MySQL)  
+   - Managed MySQL database  
+   - Stores student records  
+
+3. S3  
+   - Hosts React frontend as static website  
+
+---
+
+## 🐳 Docker Setup
+
+### Backend Dockerfile
+
+```dockerfile
+FROM openjdk:17
+COPY target/student-management.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
 ```
 
-### 2️⃣ Configure Database Connection
+### Frontend Dockerfile
 
-Update `application.properties`:
+```dockerfile
+FROM node:18 as build
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+```
+
+---
+
+## ⚙️ application.properties
 
 ```
-spring.datasource.url=jdbc:mysql://localhost:3306/studentdb
-spring.datasource.username=root
+spring.datasource.url=jdbc:mysql://<RDS-ENDPOINT>:3306/studentdb
+spring.datasource.username=admin
 spring.datasource.password=yourpassword
+
 spring.jpa.hibernate.ddl-auto=update
-```
-
-### 3️⃣ Run the Application
-
-Using Maven:
-
-```
-./mvnw spring-boot:run
-```
-
-Or run directly from your IDE (IntelliJ / VS Code).
-
-Application will start at:
-
-```
-http://localhost:8080
+spring.jpa.show-sql=true
 ```
 
 ---
 
-## 🎯 Learning Outcomes
+## ▶️ How to Run Locally
 
-- Implementation of CRUD operations
-- Understanding Spring Boot MVC architecture
-- Using Hibernate JPA for database interaction
-- Connecting Spring Boot with MySQL
-- Handling form data using ThymeleaF
+### Backend
 
+```
+mvn clean install
+mvn spring-boot:run
+```
 
+### Frontend
+
+```
+npm install
+npm start
+```
 
 ---
+
+## 🚀 Deployment Steps
+
+### Step 1: Create RDS MySQL
+- Create database in AWS RDS
+- Allow EC2 security group access
+- Update RDS endpoint in application.properties
+
+### Step 2: Deploy Backend to EC2
+- Launch Ubuntu EC2 instance
+- Install Docker
+- Build jar file
+- Build Docker image
+
+```
+docker build -t student-backend .
+docker run -p 8080:8080 student-backend
+```
+
+### Step 3: Deploy Frontend to S3
+- Run:
+
+```
+npm run build
+```
+
+- Upload build/ folder to S3 bucket
+- Enable Static Website Hosting
+- Make bucket public
+
+---
+
+## 📌 Features
+
+- Full CRUD Operations
+- REST API based backend
+- Docker containerized
+- AWS Cloud Deployment
+- Simple MVC architecture
+
+---
+
+## 🎯 Future Enhancements
+
+- Add JWT Authentication
+- Add CI/CD Pipeline (Jenkins)
+- Add Load Balancer
+- Use Docker Compose for full stack
+
+---
+
+# Thank You
