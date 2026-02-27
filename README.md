@@ -101,8 +101,3 @@ http://localhost:8080
 - Handling form data using Thymeleaf
 
 ---
-
-## 👨‍💻 Author
-
-Akshat Raj  
-B.Tech CSE (AIML)
