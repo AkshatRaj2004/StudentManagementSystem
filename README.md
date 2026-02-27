@@ -1,105 +1,200 @@
-# 📘 Student Management System (CRUD Application)
+🎓 Student Management System (AWS + Docker Deployment)
+📌 Project Description
 
-This project is a simple **Student Management System** built using **Spring Boot MVC**, **Spring Data JPA**, and **MySQL**.  
+This is a simple Student Management System CRUD Application built using:
 
-It allows users to perform basic CRUD operations:
+Backend: Java + Spring Boot
 
-- ➕ Add Student  
-- 📄 View All Students  
-- ✏ Update Student  
-- ❌ Delete Student  
+Frontend: ReactJS
 
-The application follows a proper layered architecture:  
-**Controller → Service → Repository → Database**
+Database: MySQL
 
----
+Containerization: Docker
 
-## 🛠 Technologies Used
+Cloud Services Used: AWS EC2, AWS RDS, AWS S3
 
-### Backend
-- Java 17
-- Spring Boot
-- Spring MVC
-- Spring Data JPA (Hibernate)
+Using this application, users can:
 
-### Frontend
-- Thymeleaf Template Engine
-- HTML
-- CSS
-- Bootstrap
+✅ Add new students
 
-### Database
-- MySQL
+✅ View all students
 
-### Build Tool
-- Maven
+✅ Update student details
 
----
+✅ Delete students
 
-## 🏗 Project Structure
+🏗️ Tech Stack
+Backend
 
-```
-src/main/java/learn/spring/studentmanagement/
+Java 17
+
+Spring Boot
+
+Spring Data JPA
+
+Maven
+
+Frontend
+
+ReactJS
+
+Axios
+
+Bootstrap
+
+Database
+
+MySQL (AWS RDS)
+
+DevOps & Cloud
+
+Docker
+
+AWS EC2
+
+AWS RDS
+
+AWS S3
+
+📂 Project Structure
+student-management-system/
 │
-├── Controller      → Handles HTTP requests
-├── Service         → Business logic
-├── repository      → Database operations using JPA
-├── Entity          → Student model class
-└── StudentManagementSystemApplication.java
-```
+├── backend/
+│   ├── .mvn/
+│   ├── src/
+│   │   └── main/
+│   │       ├── java/com/example/student/
+│   │       │   ├── controller/
+│   │       │   ├── service/
+│   │       │   ├── repository/
+│   │       │   └── model/
+│   │       └── resources/
+│   │           ├── application.properties
+│   │
+│   ├── pom.xml
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AddStudent.js
+│   │   │   ├── ListStudent.js
+│   │   │   └── UpdateStudent.js
+│   │   ├── App.js
+│   │   ├── index.js
+│   │   └── services/StudentService.js
+│   │
+│   ├── package.json
+│   └── Dockerfile
+│
+├── docker-compose.yml
+└── README.md
+🚀 Architecture Overview
+User → S3 (Frontend - React)
+        ↓
+      EC2 (Docker Container - Spring Boot Backend)
+        ↓
+      RDS (MySQL Database)
+🔹 AWS Services Used
+1️⃣ EC2
 
-```
-src/main/resources/
-└── application.properties   → Database configuration
-```
+Used to deploy backend Docker container
 
----
+Runs Spring Boot application
 
-## ⚙ How to Run the Project
+2️⃣ RDS (MySQL)
 
-### 1️⃣ Create Database in MySQL
+Managed MySQL database
 
-```sql
-CREATE DATABASE studentdb;
-```
+Stores student data securely
 
-### 2️⃣ Configure Database Connection
+3️⃣ S3
 
-Update `application.properties`:
+Hosts React frontend as static website
 
-```
-spring.datasource.url=jdbc:mysql://localhost:3306/studentdb
-spring.datasource.username=root
+Publicly accessible
+
+🐳 Docker Setup
+Backend Dockerfile
+FROM openjdk:17
+COPY target/student-management.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+Frontend Dockerfile
+FROM node:18 as build
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+⚙️ Configuration
+application.properties
+spring.datasource.url=jdbc:mysql://<RDS-ENDPOINT>:3306/studentdb
+spring.datasource.username=admin
 spring.datasource.password=yourpassword
+
 spring.jpa.hibernate.ddl-auto=update
-```
+spring.jpa.show-sql=true
+🧪 How to Run Locally
+Backend
+mvn clean install
+mvn spring-boot:run
+Frontend
+npm install
+npm start
+☁️ Deployment Steps (AWS)
+Step 1: Deploy Database (RDS)
 
-### 3️⃣ Run the Application
+Create MySQL RDS instance
 
-Using Maven:
+Allow EC2 security group access
 
-```
-./mvnw spring-boot:run
-```
+Update RDS endpoint in application.properties
 
-Or run directly from your IDE (IntelliJ / VS Code).
+Step 2: Deploy Backend on EC2
 
-Application will start at:
+Launch EC2 instance (Ubuntu)
 
-```
-http://localhost:8080
-```
+Install Docker
 
----
+Build jar file
 
-## 🎯 Learning Outcomes
+Build Docker image
 
-- Implementation of CRUD operations
-- Understanding Spring Boot MVC architecture
-- Using Hibernate JPA for database interaction
-- Connecting Spring Boot with MySQL
-- Handling form data using ThymeleaF
+docker build -t student-backend .
+docker run -p 8080:8080 student-backend
+Step 3: Deploy Frontend on S3
 
+Run:
 
+npm run build
 
----
+Upload build/ folder to S3 bucket
+
+Enable static website hosting
+
+Make bucket public
+
+📸 Features
+
+REST API based backend
+
+Fully containerized using Docker
+
+Cloud deployment on AWS
+
+Clean MVC architecture
+
+Simple and easy for viva explanation
+
+🎯 Future Improvements
+
+Add Authentication (JWT)
+
+Use CI/CD (Jenkins)
+
+Add Load Balancer
