@@ -98,6 +98,6 @@ http://localhost:8080
 - Understanding Spring Boot MVC architecture
 - Using Hibernate JPA for database interaction
 - Connecting Spring Boot with MySQL
-- Handling form data using Thymeleaf
+- Handling form data using ThymeleaF
 
 ---
