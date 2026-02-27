@@ -1,44 +1,307 @@
-# student-management-system-CRUD
-This student-management-system-CRUD  is a simple CRUD application for Student Management System. Written using Java and Spring Boot MVC, Spring Data JPA , MYSQL and Thymeleaf Template Engine using which one can add new student to the list, see all the student, edit existing student and delete the student.
+#  Student Management System – Full Stack Cloud Deployment
 
-### Create
-![image](https://user-images.githubusercontent.com/77236280/208498125-cef78bbf-a63f-4386-b8ac-752d5507db21.png)
+A production-ready Full Stack Student Management System built with:
 
-### Read
-![image](https://user-images.githubusercontent.com/77236280/208497990-e599f3ac-90e4-4c30-8e11-46a6d08b3f24.png)
+- ⚛️ React (Frontend)
+- ☕ Spring Boot (Backend)
+- 🛢 MySQL (Database)
+- 🐳 Docker (Containerization)
+- ☁️ AWS Cloud Deployment (S3, CloudFront, Route53, API Gateway, ECS/EKS, RDS)
 
-### Update
-![image](https://user-images.githubusercontent.com/77236280/208498391-21d7fbe3-f8c4-4a24-a5ee-30a53f9fda97.png)
+This project demonstrates end-to-end full stack development and cloud-native deployment architecture.
 
-### Delete
-Before Delete:
-![image](https://user-images.githubusercontent.com/77236280/208498508-f75b6ea8-ecad-4778-b24a-a6def270b9e2.png)
-After Delete: 
-![image](https://user-images.githubusercontent.com/77236280/208498590-d2226c39-0827-40a6-bf44-ac6db1b23ad5.png)
+---
 
-## Personal goals
-* Learn to develop and implement CRUD and REST services using Spring MVC (Boot)
-* Understanding configuration and execution of spring framework
-* Performing CRUD operations using Spring Boot Hibernate data jpa
+## 🏗 Architecture Overview
 
-## Technologies Used
- #### Backend
-  + Java 17 (Open JDK)
-  + Spring Boot
-  + Hibernate JPA
- #### Template Engine
-  + Thymeleaf
- #### Frontend
-  + Html 
-  + CSS
-  + Bootstrap 
- #### Database
-  + MYSQL database
-  
- #### Dependency Management Tool
-  + Maven
- 
- #### IDE
-  + Intellij-Idea 
+Frontend:
+React App → S3 → CloudFront → Route53
 
+Backend:
+Spring Boot (Dockerized) → ECR → ECS (Fargate) / EKS
 
+Database:
+Amazon RDS (MySQL)
+
+API Management:
+API Gateway → Load Balancer → ECS Service
+
+---
+
+## 🛠 Technology Stack
+
+### Frontend
+- React
+- TypeScript
+- TailwindCSS
+- Vite
+
+### Backend
+- Java
+- Spring Boot
+- JPA / Hibernate
+
+### Database
+- MySQL (Local Development)
+- Amazon RDS MySQL (Production)
+
+### DevOps & Cloud
+- Docker
+- AWS S3
+- AWS CloudFront
+- AWS Route53
+- AWS API Gateway
+- AWS ECS / EKS
+- AWS RDS
+- AWS ECR
+- Terraform (Optional)
+- GitHub Actions (Optional CI/CD)
+
+---
+
+# 📂 Project Structure
+
+```
+student-management-system/
+│
+├── frontend/
+│   ├── Dockerfile
+│   └── src/
+│
+├── backend/
+│   ├── Dockerfile
+│   ├── src/
+│   └── application.properties
+│
+├── docker-compose.yml
+├── k8s/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│
+└── README.md
+```
+
+---
+
+# 🐳 Docker Setup (Local Development)
+
+## Backend Dockerfile
+
+```dockerfile
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+## Frontend Dockerfile
+
+```dockerfile
+FROM node:18-alpine as build
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+---
+
+# 🐳 Docker Compose (Local Full Stack)
+
+```yaml
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: studentdb
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+```
+
+---
+
+# ☁️ AWS Deployment Architecture
+
+## 🔹 Frontend Deployment
+
+1. Build React App
+```
+npm run build
+```
+
+2. Upload `/dist` folder to:
+- AWS S3 (Static Website Hosting)
+
+3. Create:
+- CloudFront Distribution
+- Route53 domain mapping
+
+---
+
+## 🔹 Backend Deployment (ECS Fargate)
+
+1. Build Docker Image
+```
+docker build -t student-backend .
+```
+
+2. Push to AWS ECR
+
+3. Create:
+- ECS Cluster
+- Task Definition
+- ECS Service
+- Application Load Balancer
+
+---
+
+## 🔹 Database (Amazon RDS)
+
+- Engine: MySQL
+- Multi-AZ (Optional)
+- Public access: Disabled
+- Security Group: Allow ECS access only
+
+Update `application.properties`:
+
+```
+spring.datasource.url=jdbc:mysql://<RDS-ENDPOINT>:3306/studentdb
+spring.datasource.username=admin
+spring.datasource.password=yourpassword
+```
+
+---
+
+## 🔹 API Gateway Setup
+
+- Create HTTP API
+- Connect to Application Load Balancer
+- Enable CORS
+- Deploy stage
+
+---
+
+# ☸ Kubernetes Deployment (Optional – EKS)
+
+## deployment.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-backend
+  template:
+    metadata:
+      labels:
+        app: student-backend
+    spec:
+      containers:
+        - name: backend
+          image: <ECR_IMAGE_URI>
+          ports:
+            - containerPort: 8080
+```
+
+## service.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-backend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: student-backend
+  ports:
+    - port: 80
+      targetPort: 8080
+```
+
+---
+
+# 🔐 Environment Variables
+
+Use environment variables instead of hardcoding credentials.
+
+Example:
+
+```
+SPRING_DATASOURCE_URL
+SPRING_DATASOURCE_USERNAME
+SPRING_DATASOURCE_PASSWORD
+```
+
+---
+
+# 🚀 CI/CD (Optional)
+
+- GitHub Actions
+- Build Docker image
+- Push to ECR
+- Trigger ECS deployment
+
+---
+
+# 📈 Future Improvements
+
+- JWT Authentication
+- Role-based Access Control
+- Monitoring (CloudWatch)
+- Logging
+- Auto Scaling
+- Blue-Green Deployment
+- Terraform Infrastructure as Code
+
+---
+
+# 🎯 Learning Outcomes
+
+- Full Stack Development
+- REST API Design
+- Dockerization
+- Cloud Architecture
+- Container Orchestration
+- Production Deployment on AWS
+
+---
+
+# 👨‍💻 Author
+
+Akshat Raj  
+B.Tech CSE (AIML)  
+Cloud & DevOps Enthusiast  
+
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
